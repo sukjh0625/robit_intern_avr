@@ -154,7 +154,7 @@ void twi_stop(void)// 통신 종료
 void lcd_expander(uint8_t data)// lcd의 확장기로 데이터 보내는 함수
 {
 	twi_start();
-	twi_write(data | LCD_LIGHT);/lcd로 데이터 전송
+	twi_write(data | LCD_LIGHT);//lcd로 데이터 전송
 	twi_stop();
 }
 
