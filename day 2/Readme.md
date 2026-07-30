@@ -48,3 +48,6 @@ AVCC전원 안정화
 
 최소 감지 전압
 ADC가 감지할 수 있는 가장 작은 전압 변화 단위는 1LSB이다
+
+과제 2 https://drive.google.com/file/d/1hEbJroXGBGcaOtHVkSFnHujRlhCc5oNv/view?usp=sharing
+과제 3 https://drive.google.com/file/d/1ADQO4VIBSb8wijyMJI_YJwib00B-1CM6/view?usp=sharing
