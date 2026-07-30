@@ -8,3 +8,5 @@
 
 그래서 저항이 플로팅을 막는 원리는 기본적으로 플로팅이란 HIGH LOW 둘다 연결되어 있는 것이 아니기 때문에 저항을 연결하게 되면 스위치를 안눌러도 5V와 연결되고 스위치를 누르면 GND와 연결되기 떄문에 연결이 확실하게 된다. 항상 어딘가에 연결되어있기 때문에 플로팅이 발생하지 않는다.
 
+과제 2 https://drive.google.com/file/d/1RtkfYVsklHorFOg83ii73s_SxFwVuGWK/view?usp=sharing
+과제 3 https://drive.google.com/file/d/1TzMXV2GAO_gGkkb3T2X5xsz6GvJpqWwf/view?usp=sharing
