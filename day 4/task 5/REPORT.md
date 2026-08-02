@@ -180,3 +180,4 @@ Moved to 180 degrees.
 ## 6. ai사용
 
 보고서 틀을 잡는데 도움을 받음. 시리얼 입력값의 범위 검사와 코드 오류를 점검하는 데 참고하였다. 또한 서보모터 각도에 따른 OCR1C 값 계산 방법을 확인하는데 도움을 받았따.
+https://drive.google.com/file/d/1B4Vzybc4UCONhgLifmYI9TXMz-uSxqmv/view?usp=sharing
