@@ -7,9 +7,8 @@
 #include <math.h>
 
 #define BAUD_RATE          9600
-#define MEASURE_PERIOD_MS  200      // measurement period (ms)
-
-#define PSD_ADC_CHANNEL    1        // PORTF1 = ADC1, PSD signal line
+#define MEASURE_PERIOD_MS  200      
+#define PSD_ADC_CHANNEL    1       
 
 #define DIST_COEF_A        2670.4f
 #define DIST_COEF_B        -0.769f
