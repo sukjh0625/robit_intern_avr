@@ -86,7 +86,7 @@ void Servo_PWM_init(void)//서보 pwm초기화
     ICR1 = PWM_TOP;
 }
 
-void Servo_set_angle(int angle)//각도를 pwm값으로 바꾸는 부분
+void Servo_set_angle(int angle)//각도를 pwm값으로 바꾸는 부분// 입력받은 값이 2000부터 4000틱 값으로 비례해서 변환
 {
     unsigned int ticks = SERVO_MIN_TICKS +
         (unsigned long)(SERVO_MAX_TICKS - SERVO_MIN_TICKS) * angle / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
