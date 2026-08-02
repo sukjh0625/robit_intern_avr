@@ -17,7 +17,7 @@
 
 #define RX_BUF_SIZE        16
 
-void UART0_init(unsigned long baud)
+void UART0_init(unsigned long baud)//uart 초기화
 {
     unsigned int ubrr = (F_CPU / 16 / baud) - 1;
 
@@ -28,13 +28,13 @@ void UART0_init(unsigned long baud)
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 }
 
-void UART0_transmit(unsigned char data)
+void UART0_transmit(unsigned char data)//uart 송신
 {
     while (!(UCSR0A & (1 << UDRE0)));
     UDR0 = data;
 }
 
-void UART0_print(const char *str)
+void UART0_print(const char *str)//uart 문자열 입력
 {
     while (*str)
     {
@@ -76,7 +76,7 @@ void UART0_read_line(char *buf, unsigned char max_len)
     buf[idx] = '\0';
 }
 
-void Servo_PWM_init(void)
+void Servo_PWM_init(void)//서보 pwm초기화
 {
     DDRB |= (1 << PB7);  
 
@@ -86,7 +86,7 @@ void Servo_PWM_init(void)
     ICR1 = PWM_TOP;
 }
 
-void Servo_set_angle(int angle)
+void Servo_set_angle(int angle)//각도를 pwm값으로 바꾸는 부분
 {
     unsigned int ticks = SERVO_MIN_TICKS +
         (unsigned long)(SERVO_MAX_TICKS - SERVO_MIN_TICKS) * angle / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
@@ -103,7 +103,7 @@ int main(void)
     Servo_set_angle(ORIGIN_ANGLE);
     _delay_ms(500);  
 
-    UART0_print(" Servo Control Ready (origin: 90 deg) ===\r\n");
+    UART0_print(" Servo Control Ready (origin: 90 deg) \r\n");
     UART0_print("Enter target angle and press Enter:\r\n");
 
     while (1)
