@@ -7,18 +7,17 @@
 #include <math.h>
 
 #define BAUD_RATE          9600
-#define MEASURE_PERIOD_MS  200      // measurement period (ms)
+#define MEASURE_PERIOD_MS  200   
 
-#define PSD_ADC_CHANNEL    1        // PORTF1 = ADC1, PSD signal line
-
+#define PSD_ADC_CHANNEL    1       
 
 #define DIST_COEF_A        2670.4f
 #define DIST_COEF_B        -0.769f
 
-#define DIST_MIN_CM        15.0f    // minimum valid distance
-#define DIST_MAX_CM        60.0f    // maximum valid distance
-#define ADC_MIN_VALID      100      // below this: sensor disconnected/abnormal
-#define ADC_MAX_VALID      900      // above this: too close / saturated
+#define DIST_MIN_CM        15.0f   
+#define DIST_MAX_CM        60.0f   
+#define ADC_MIN_VALID      100      
+#define ADC_MAX_VALID      900     
 
 void UART0_init(unsigned long baud)
 {
