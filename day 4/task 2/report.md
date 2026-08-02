@@ -369,3 +369,4 @@ sei();
 ### AI 활용 및 검증 원칙
 
 AI는 개념 이해와 코드 구조 검토를 위한 보조 도구로 사용 및 누락된 변수 찾기에 사용
+https://drive.google.com/file/d/1SEvBbzZbkrmbY9_GQKvJNtbKpzZFHaIe/view?usp=sharing
