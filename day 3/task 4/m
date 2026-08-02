@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #define TX_BIT PD3 
-#define BIT_TICKS 208
+#define BIT_TICKS 104
 
 void wait_bit(void)
 {
