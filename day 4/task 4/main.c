@@ -61,14 +61,14 @@ unsigned int ADC_read(unsigned char channel)
     return ADC;
 }
 
-unsigned int filter_buf[FILTER_WINDOW_SIZE];
+unsigned int filter_buf[FILTER_WINDOW_SIZE];//8개의 값을 저장할 배열 위치 저장
 unsigned char filter_index = 0;
 unsigned char filter_filled = 0;   
-unsigned long filter_sum = 0;
+unsigned long filter_sum = 0;//전체 합 저
 
-unsigned int filter_update(unsigned int new_sample)
+unsigned int filter_update(unsigned int new_sample)// 필터 넣기
 {
-    filter_sum -= filter_buf[filter_index];
+    filter_sum -= filter_buf[filter_index];//새 adc값 드어오면 오래된 값 하나 교체
     filter_buf[filter_index] = new_sample;
     filter_sum += new_sample;
 
@@ -121,7 +121,7 @@ int main(void)
 
     while (1)
     {
-        raw_val      = ADC_read(PSD_ADC_CHANNEL);
+        raw_val      = ADC_read(PSD_ADC_CHANNEL);// 필터 사용
         filtered_val = filter_update(raw_val);
 
         distance_cm = ADC_to_distance_cm(filtered_val);
