@@ -1,1 +1,75 @@
+#define F_CPU 16000000UL
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <stdint.h>
+
+#define TX_BIT PD3 //데이터를 보낼핀을 pd3로 설정
+#define BIT_TICKS 208
+
+void wait_bit(void)
+{
+    TCNT1 = 0;
+
+    while (TCNT1 < BIT_TICKS)
+    {}
+}
+
+void send_byte(uint8_t data)
+{
+    uint8_t a;
+
+    PORTD &= ~(1 << TX_BIT);
+    wait_bit();
+
+    for (a = 0; a < 8; a++)
+    {
+        if (data & (1 << a))
+        {
+            PORTD |= (1 << TX_BIT);
+        }
+        else
+        {
+            PORTD &= ~(1 << TX_BIT);
+        }
+
+        wait_bit();
+    }
+
+    PORTD |= (1 << TX_BIT);
+    wait_bit();
+}
+
+int main(void)
+{
+    cli();
+
+    DDRD |= (1 << TX_BIT);
+    PORTD |= (1 << TX_BIT);
+
+    TCCR1A = 0x00;
+    TCCR1B = (1 << CS11);
+
+    while (1)
+    {
+        send_byte(0x48);  // H
+        send_byte(0x65);  // e
+        send_byte(0x6C);  // l
+        send_byte(0x6C);  // l
+        send_byte(0x6F);  // o
+        send_byte(0x57);  // W
+        send_byte(0x6F);  // o
+        send_byte(0x72);  // r
+        send_byte(0x6C);  // l
+        send_byte(0x64);  // d
+        send_byte(0x21);  // !
+
+        send_byte(0x0D);
+        send_byte(0x0A);
+
+        for (uint16_t a = 0; a < 1000; a++)
+        {
+            wait_bit();
+        }
+    }
+}
