@@ -12,6 +12,7 @@
 #define PSD_ADC_CHANNEL    1       
 
 #define DIST_COEF_A        2670.4f
+//adc값을 실제 거리로 바꾸기 위함
 #define DIST_COEF_B        -0.769f
 
 #define DIST_MIN_CM        15.0f   
@@ -19,18 +20,18 @@
 #define ADC_MIN_VALID      100      
 #define ADC_MAX_VALID      900     
 
-void UART0_init(unsigned long baud)
+void UART0_init(unsigned long baud)//uart초기화
 {
     unsigned int ubrr = (F_CPU / 16 / baud) - 1;
 
-    UBRR0H = (unsigned char)(ubrr >> 8);
+    UBRR0H = (unsigned char)(ubrr >> 8);//9600으로 계싼
     UBRR0L = (unsigned char)(ubrr);
 
     UCSR0B = (1 << RXEN0) | (1 << TXEN0);         
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);       
 }
 
-void UART0_transmit(unsigned char data)
+void UART0_transmit(unsigned char data)//문자열보내기
 {
     while (!(UCSR0A & (1 << UDRE0)));  
     UDR0 = data;
@@ -50,7 +51,7 @@ void ADC_init(void)
     ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
 
-unsigned int ADC_read(unsigned char channel)
+unsigned int ADC_read(unsigned char channel)//기준전압 설정 유지하면서 adc채녈만 바꾸기
 {
     ADMUX = (ADMUX & 0xE0) | (channel & 0x1F);  
 
@@ -60,7 +61,7 @@ unsigned int ADC_read(unsigned char channel)
     return ADC;                                 
 }
 
-float ADC_to_distance_cm(unsigned int adc_value)
+float ADC_to_distance_cm(unsigned int adc_value)//adc값 거리로 바꾸기
 {
     if (adc_value < ADC_MIN_VALID || adc_value > ADC_MAX_VALID)
     {
@@ -86,7 +87,7 @@ int main(void)
     UART0_init(BAUD_RATE);
     ADC_init();
 
-    UART0_print("=== PSD Distance Measurement Start (v2 calibrated) ===\r\n");
+    UART0_print("PSD Distance Measurement Start  \r\n");
 
     while (1)
     {
@@ -95,7 +96,7 @@ int main(void)
 
         if (distance_cm < 0.0f)
         {
-            sprintf(buf, "ADC:%4u  -> [ERROR] Invalid PSD reading\r\n", adc_val);
+            sprintf(buf, " [ERROR] Invalid PSD reading\r\n", adc_val);// 예외처리
         }
         else
         {
