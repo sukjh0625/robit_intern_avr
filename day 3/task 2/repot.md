@@ -143,7 +143,7 @@ if (UCSR0A & (1 << RXC0))
 
 ---
 
-## 6. 동작 설명 및 결과 (Results)
+## 5. 동작 설명 및 결과 (Results)
 
 ### 동작 시나리오
 
@@ -161,7 +161,7 @@ if (UCSR0A & (1 << RXC0))
 
 ---
 
-## 7. AI 툴 활용 명시 (AI Tools Declaration)
+## 6. AI 툴 활용 명시 (AI Tools Declaration)
 
  ChatGPT를 UART 레지스터와 통신 흐름의 개념을 이해하는데 사용
 
