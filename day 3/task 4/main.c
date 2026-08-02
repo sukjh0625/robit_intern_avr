@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
-#define TX_BIT PD3 //데이터를 보낼핀을 pd3로 설정
+#define TX_BIT PD3 
 #define BIT_TICKS 208
 
 void wait_bit(void)
