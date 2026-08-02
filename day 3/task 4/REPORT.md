@@ -167,3 +167,4 @@ HelloWorld!
 ### AI 활용 및 검증 원칙
 1. **코드 검증:** 작성한 코드는 직접 컴파일하고 ATmega128 보드에 업로드하여 시리얼 모니터 출력으로 확인함.
 2. **통신 설정 확인:** 시리얼 모니터의 통신 속도를 9600bps, 8N1로 설정하여 코드의 비트 시간과 일치하도록 확인함.
+https://drive.google.com/file/d/1XbZZeS9G_C34gTGZ5-5DjqBwFblFBWgs/view?usp=sharing
