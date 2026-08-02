@@ -1,4 +1,4 @@
-# 4일차 과제 3 : PSD 센서 기반 거리 측정 시스템
+# 4일차 과제 4: PSD 센서 기반 거리 측정 시스템
 
 > **광운대학교 로봇게임단 수습단원 교육**  
 > **학과:** 전자융합공학과  
@@ -58,63 +58,7 @@ PSD 센서는 전원(Vcc), 접지(GND), 아날로그 출력(Vo)의 3개 선을 �
 
 ---
 
-## 4. 프로젝트 구조 (Directory Structure)
-
-빌드 시 `math.h`의 `powf()`를 사용하므로 AVR-GCC 환경에서 수학 라이브러리 링크 옵션이 필요한 경우 `-lm`을 추가한다.
-
-```text
-avr-gcc -mmcu=atmega128 -Os -Wall -std=gnu99 -o firmware.elf PSD_Distance.c -lm
-avr-objcopy -O ihex -R .eeprom firmware.elf firmware.hex
-```
-
----
-
-## 5. 핵심 코드 및 레지스터 설정 (Key Implementation)
-
-### UART0 초기화
-
-```c
-unsigned int ubrr = (F_CPU / 16 / baud) - 1;
-
-UBRR0H = (unsigned char)(ubrr >> 8);
-UBRR0L = (unsigned char)ubrr;
-UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-```
-
-`F_CPU`가 16 MHz이고 통신 속도가 9600 bps일 때 UBRR 값은 약 103이다. `UCSR0B`에서 송신기(TXEN0)와 수신기(RXEN0)를 켜고, `UCSR0C`에서 데이터 비트를 8비트로 설정하였다. 따라서 터미널은 **9600 bps, 8N1**로 설정한다.
-
-### ADC 초기화 및 값 읽기
-
-```c
-ADMUX = (1 << REFS0);
-ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-```
-
-`REFS0`을 1로 설정하여 AVCC(5V)를 ADC 기준 전압으로 사용한다. 분주비 128을 사용하므로 ADC 클록은 `16 MHz / 128 = 125 kHz`가 된다. 이는 ATmega128 ADC의 권장 동작 범위에 맞는 값이다.
-
-```c
-ADMUX = (ADMUX & 0xE0) | (channel & 0x1F);
-ADCSRA |= (1 << ADSC);
-while (ADCSRA & (1 << ADSC));
-return ADC;
-```
-
-입력 채널 번호 1을 ADMUX에 넣어 ADC1(PF1)을 선택한다. `ADSC`를 1로 설정하여 변환을 시작하고, 변환이 끝나 `ADSC`가 0이 될 때까지 기다린 후 10비트 ADC 결과(0~1023)를 반환한다.
-
-### 거리 환산 방식
-
-PSD 센서의 출력은 거리와 선형 관계가 아니므로 단순 비례식으로 변환할 수 없다. 이 프로그램에서는 실측 보정값을 기반으로 한 아래 거듭제곱 근사식을 사용한다.
-
-```c
-float distance = DIST_COEF_A * powf((float)adc_value, DIST_COEF_B);
-```
-
-```text
-distance(cm) = 2670.4 × ADC^(-0.769)
-```
-
-ADC 값이 커질수록 계산된 거리는 작아진다. 이는 일반적인 PSD 센서가 가까운 물체에서 더 높은 출력 전압을 내는 특성과 일치한다.
+## 4. 핵심 코드 및 레지스터 설정 (Key Implementation)
 
 ### 이동평균 필터
 
@@ -165,7 +109,7 @@ _delay_ms(MEASURE_PERIOD_MS);
 
 ---
 
-## 6. 동작 설명 및 결과 (Results)
+## 5. 동작 설명 및 결과 (Results)
 
 ### 동작 시나리오
 
