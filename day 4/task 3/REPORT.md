@@ -1,6 +1,7 @@
 # 4일차 과제 3 : PSD 센서 기반 거리 측정 시스템
 
-> **광운대학교 로봇게임단 수습단원 교육**  
+> **광운대학교 로봇게임단 수습단원 교육**
+> **전자융합공학과**
 > **작성자:** 석주형  
 > **제출일:** 2026년 8월 3일
 
@@ -8,7 +9,7 @@
 
 ## 1. 개요 (Overview)
 
-본 과제는 Sharp PSD 거리 센서의 아날로그 출력 전압을 ATmega128의 ADC로 읽고, 보정식을 사용하여 거리(cm)로 환산한 뒤 UART0으로 PC에 출력하는 프로그램을 구현하는 것이다. 측정 범위를 벗어난 ADC 값과 계산 결과는 정상 거리로 출력하지 않고 오류로 처리하였다.
+PSD 거리 센서의 아날로그 출력 전압을 ATmega128의 ADC로 읽고, 보정식을 사용하여 거리(cm)로 환산한 뒤 UART0으로 PC에 출력하는 프로그램을 구현하는 것이다. 측정 범위를 벗어난 ADC 값과 계산 결과는 정상 거리로 출력하지 않고 오류로 처리하였다.
 
 ### 핵심 목표
 
@@ -28,7 +29,6 @@
 | **Programmer** | STK500 호환 USB ISP |
 | **Terminal** | Tera Term 또는 Serial 통신 프로그램 |
 | **언어** | C Language |
-| **주요 부품** | ATmega128 실습보드, PSD 거리 센서, USB-Serial 어댑터 |
 
 ---
 
@@ -58,14 +58,6 @@ PSD 센서는 전원(Vcc), 접지(GND), 아날로그 출력(Vo)의 3개 선을 �
 ---
 
 ## 4. 프로젝트 구조 (Directory Structure)
-
-> 구현부(.c)와 보고서 파일만 표기하였다.
-
-```text
-├── Day4_PSD/
-│   ├── PSD_Distance.c       # UART0, ADC, 거리 환산, 예외 처리
-│   └── REPORT.md
-```
 
 빌드 시 `math.h`의 `powf()`를 사용하므로 AVR-GCC 환경에서 수학 라이브러리 링크 옵션이 필요한 경우 `-lm`을 추가한다.
 
@@ -195,132 +187,13 @@ ADC:  42  -> [ERROR] Invalid PSD reading
 | 도구명 (Tool) | 활용 영역 | 세부 사용 목적 및 내용 |
 | :--- | :--- | :--- |
 | **ChatGPT** | 개념 이해 | ADC 채널 선택, UART0 설정, PSD 거리 환산식의 의미 확인 |
-| **ChatGPT** | 코드 검토 | ADC 범위 검사와 거리 범위 검사가 필요한 이유 점검 |
+| **ChatGPT** | 코드 검토 | ADC값과 거리 사이의 비를 이용해서 보정값 찾는데 사용|
 | **ChatGPT** | 디버깅 보조 | ADC 값 0 또는 1023 고정 시 확인할 배선 원인 정리 |
 
 ### AI 활용 및 검증 원칙
 
 1. **코드 검증:** 레지스터 설정과 핀 연결은 ATmega128 데이터시트 및 UART 교육자료를 기준으로 다시 확인하였다.
 2. **실측 검증:** 보정식의 계수와 정상 범위는 실제 센서를 연결하여 터미널 출력값과 실제 거리를 비교하여 확인해야 한다.
-3. **학습 주도성:** AI는 개념 정리와 코드 검토 보조로 활용하고, 최종 배선 확인 및 동작 검증은 직접 수행한다.
+3. **학습 주도성:** AI는 개념 정리와 코드 검토 보조로 활용함
 
 ---
-
-## 8. 전체 코드
-
-```c
-#define F_CPU 16000000UL
-
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#define BAUD_RATE          9600
-#define MEASURE_PERIOD_MS  200
-#define PSD_ADC_CHANNEL    1
-
-#define DIST_COEF_A        2670.4f
-#define DIST_COEF_B        -0.769f
-
-#define DIST_MIN_CM        15.0f
-#define DIST_MAX_CM        60.0f
-#define ADC_MIN_VALID      100
-#define ADC_MAX_VALID      900
-
-void UART0_init(unsigned long baud)
-{
-    unsigned int ubrr = (F_CPU / 16 / baud) - 1;
-
-    UBRR0H = (unsigned char)(ubrr >> 8);
-    UBRR0L = (unsigned char)ubrr;
-    UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-}
-
-void UART0_transmit(unsigned char data)
-{
-    while (!(UCSR0A & (1 << UDRE0)));
-    UDR0 = data;
-}
-
-void UART0_print(const char *str)
-{
-    while (*str)
-    {
-        UART0_transmit(*str++);
-    }
-}
-
-void ADC_init(void)
-{
-    ADMUX = (1 << REFS0);
-    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-}
-
-unsigned int ADC_read(unsigned char channel)
-{
-    ADMUX = (ADMUX & 0xE0) | (channel & 0x1F);
-    ADCSRA |= (1 << ADSC);
-
-    while (ADCSRA & (1 << ADSC));
-
-    return ADC;
-}
-
-float ADC_to_distance_cm(unsigned int adc_value)
-{
-    if (adc_value < ADC_MIN_VALID || adc_value > ADC_MAX_VALID)
-    {
-        return -1.0f;
-    }
-
-    float distance = DIST_COEF_A * powf((float)adc_value, DIST_COEF_B);
-
-    if (distance < DIST_MIN_CM || distance > DIST_MAX_CM)
-    {
-        return -1.0f;
-    }
-
-    return distance;
-}
-
-int main(void)
-{
-    char buf[64];
-    unsigned int adc_val;
-    float distance_cm;
-
-    UART0_init(BAUD_RATE);
-    ADC_init();
-
-    UART0_print("=== PSD Distance Measurement Start (v2 calibrated) ===\r\n");
-
-    while (1)
-    {
-        adc_val = ADC_read(PSD_ADC_CHANNEL);
-        distance_cm = ADC_to_distance_cm(adc_val);
-
-        if (distance_cm < 0.0f)
-        {
-            sprintf(buf, "ADC:%4u  -> [ERROR] Invalid PSD reading\r\n", adc_val);
-        }
-        else
-        {
-            int whole = (int)distance_cm;
-            int frac = (int)((distance_cm - whole) * 10.0f);
-
-            if (frac < 0)
-            {
-                frac = -frac;
-            }
-
-            sprintf(buf, "ADC:%4u  -> Distance: %d.%d cm\r\n", adc_val, whole, frac);
-        }
-
-        UART0_print(buf);
-        _delay_ms(MEASURE_PERIOD_MS);
-    }
-}
-```
