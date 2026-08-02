@@ -157,7 +157,7 @@ if (UCSR0A & (1 << RXC0))
 
 ## 동작 사진 / 영상
 
-| 시연 영상 |
+[| 시연 영상 |](https://drive.google.com/file/d/1bzu5NS7QXZKkNdWo6E0ws57GEkZ8UdYB/view?usp=sharing)
 
 ---
 
