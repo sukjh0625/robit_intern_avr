@@ -47,7 +47,7 @@ HIGH   ->      LOW     ->   bit0 ~ bit7          ->     HIGH
 
 ---
 
-## 5. 핵심 코드 및 레지스터 설정 (Key Implementation)
+## 4. 핵심 코드 및 레지스터 설정 (Key Implementation)
 
 ### 비트 시간 생성 (main.c)
 
@@ -126,7 +126,7 @@ PORTD |= (1 << TX_BIT);
 
 `0x48`은 `H`, `0x65`는 `e`, `0x6C`는 `l`과 같이 각 16진수 값은 ASCII 문자 코드임. `0x0D`는 커서를 줄 처음으로 이동시키는 CR 코드이고, `0x0A`는 다음 줄로 이동시키는 LF 코드임.
 
-## 6. 동작 설명 및 결과 (Results)
+## 5. 동작 설명 및 결과 (Results)
 
 ### 동작 시나리오
 1. 전원 인가 시 인터럽트를 비활성화하고 PD3을 출력으로 설정함
@@ -155,7 +155,7 @@ HelloWorld!
 
 ---
 
-## 7. AI 툴 활용 명시 (AI Tools Declaration)
+## 6. AI 툴 활용 명시 (AI Tools Declaration)
 본 과제 작성 및 구현 과정에서 활용한 AI 도구의 사용 현황 및 목적은 다음과 같음.
 
 | 도구명 (Tool) | 활용 영역 | 세부 사용 목적 및 내용 |
