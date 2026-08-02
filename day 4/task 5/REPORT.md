@@ -9,7 +9,7 @@
 
 ## 1. 개요 (Overview)
 
-본 과제는 PC 터미널에서 UART0으로 서보모터의 목표 각도(0~180)를 입력하면, ATmega128이 입력값을 받아 PWM 신호를 만들고 서보모터를 해당 각도로 이동시키는 프로그램을 구현하는 것이다. 시작 시 서보를 원점인 90도로 이동시키며, 허용 범위를 벗어난 값은 모터를 움직이지 않고 경고 메시지를 출력하도록 예외 처리하였다.
+ PC 터미널에서 UART0으로 서보모터의 목표 각도(0~180)를 입력하면, ATmega128이 입력값을 받아 PWM 신호를 만들고 서보모터를 해당 각도로 이동시키는 프로그램을 구현하는 것이다. 시작 시 서보를 원점인 90도로 이동시키며, 허용 범위를 벗어난 값은 모터를 움직이지 않고 경고 메시지를 출력하도록 예외 처리하였다.
 
 ### 핵심 목표
 
@@ -30,7 +30,6 @@
 | **Programmer** | STK500 호환 USB ISP |
 | **Terminal** | Tera Term 또는 Serial 통신 프로그램 |
 | **언어** | C Language |
-| **주요 부품** | ATmega128 실습보드, 서보모터, USB-Serial 어댑터 |
 
 터미널 통신 설정은 **9600 bps, 8 data bits, no parity, 1 stop bit (8N1)**로 설정한다.
 
@@ -55,17 +54,7 @@
 
 ---
 
-## 4. 프로젝트 구조 (Directory Structure)
-
-```text
-├── Day3_Servo/
-│   ├── Servo_UART.c       # UART0 입력, Timer1 PWM, 각도 범위 검사
-│   └── REPORT.md
-```
-
----
-
-## 5. 핵심 코드 및 레지스터 설정 (Key Implementation)
+## 4. 핵심 코드 및 레지스터 설정 (Key Implementation)
 
 ### UART0 초기화
 
@@ -152,7 +141,7 @@ if (angle < SERVO_MIN_ANGLE || angle > SERVO_MAX_ANGLE)
 
 ---
 
-## 6. 동작 설명 및 결과 (Results)
+## 5. 동작 설명 및 결과 (Results)
 
 ### 동작 시나리오
 
@@ -188,143 +177,6 @@ Moved to 180 degrees.
 
 ---
 
-## 7. 전체 코드
+## 6. ai사용
 
-```c
-#define F_CPU 16000000UL
-
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define BAUD_RATE          9600
-
-#define SERVO_MIN_ANGLE    0
-#define SERVO_MAX_ANGLE    180
-#define ORIGIN_ANGLE       90
-
-#define PWM_TOP            39999
-#define SERVO_MIN_TICKS    2000
-#define SERVO_MAX_TICKS    4000
-
-#define RX_BUF_SIZE        16
-
-void UART0_init(unsigned long baud)
-{
-    unsigned int ubrr = (F_CPU / 16 / baud) - 1;
-
-    UBRR0H = (unsigned char)(ubrr >> 8);
-    UBRR0L = (unsigned char)(ubrr);
-
-    UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-}
-
-void UART0_transmit(unsigned char data)
-{
-    while (!(UCSR0A & (1 << UDRE0)));
-    UDR0 = data;
-}
-
-void UART0_print(const char *str)
-{
-    while (*str)
-    {
-        UART0_transmit(*str++);
-    }
-}
-
-unsigned char UART0_receive(void)
-{
-    while (!(UCSR0A & (1 << RXC0)));
-    return UDR0;
-}
-
-void UART0_read_line(char *buf, unsigned char max_len)
-{
-    unsigned char idx = 0;
-
-    while (idx < max_len - 1)
-    {
-        unsigned char c = UART0_receive();
-
-        if (c == '\r' || c == '\n')
-        {
-            UART0_print("\r\n");
-            break;
-        }
-
-        if ((c == 0x08 || c == 0x7F) && idx > 0)
-        {
-            idx--;
-            UART0_print("\b \b");
-            continue;
-        }
-
-        buf[idx++] = (char)c;
-        UART0_transmit(c);
-    }
-
-    buf[idx] = '\0';
-}
-
-void Servo_PWM_init(void)
-{
-    DDRB |= (1 << PB7);
-
-    TCCR1A = (1 << COM1C1) | (1 << WGM11);
-    TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11);
-
-    ICR1 = PWM_TOP;
-}
-
-void Servo_set_angle(int angle)
-{
-    unsigned int ticks = SERVO_MIN_TICKS +
-        (unsigned long)(SERVO_MAX_TICKS - SERVO_MIN_TICKS) * angle / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
-
-    OCR1C = ticks;
-}
-
-int main(void)
-{
-    char rx_buf[RX_BUF_SIZE];
-
-    UART0_init(BAUD_RATE);
-    Servo_PWM_init();
-
-    Servo_set_angle(ORIGIN_ANGLE);
-    _delay_ms(500);
-
-    UART0_print("=== Servo Control Ready (origin: 90 deg) ===\r\n");
-    UART0_print("Enter target angle (0~180) and press Enter:\r\n");
-
-    while (1)
-    {
-        UART0_print("> ");
-        UART0_read_line(rx_buf, RX_BUF_SIZE);
-
-        if (rx_buf[0] == '\0')
-        {
-            continue;
-        }
-
-        int angle = atoi(rx_buf);
-
-        if (angle < SERVO_MIN_ANGLE || angle > SERVO_MAX_ANGLE)
-        {
-            UART0_print("[WARNING] Angle out of range (0~180). Servo not moved.\r\n");
-            continue;
-        }
-
-        Servo_set_angle(angle);
-
-        char msg[48];
-        sprintf(msg, "Moved to %d degrees.\r\n", angle);
-        UART0_print(msg);
-    }
-
-    return 0;
-}
-```
+보고서 틀을 잡는데 도움을 받음. 시리얼 입력값의 범위 검사와 코드 오류를 점검하는 데 참고하였다. 또한 서보모터 각도에 따른 OCR1C 값 계산 방법을 확인하는데 도움을 받았따.
