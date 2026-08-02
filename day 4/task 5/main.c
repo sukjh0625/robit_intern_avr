@@ -103,8 +103,8 @@ int main(void)
     Servo_set_angle(ORIGIN_ANGLE);
     _delay_ms(500);  
 
-    UART0_print("=== Servo Control Ready (origin: 90 deg) ===\r\n");
-    UART0_print("Enter target angle (0~180) and press Enter:\r\n");
+    UART0_print(" Servo Control Ready (origin: 90 deg) ===\r\n");
+    UART0_print("Enter target angle and press Enter:\r\n");
 
     while (1)
     {
