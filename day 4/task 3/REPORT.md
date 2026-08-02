@@ -197,3 +197,4 @@ ADC:  42  -> [ERROR] Invalid PSD reading
 3. **학습 주도성:** AI는 개념 정리와 코드 검토 보조로 활용함
 
 ---
+https://drive.google.com/file/d/1SKn1aEMe-Pn7jZwtbZFGPdeCqwX5ONVJ/view?usp=sharing
